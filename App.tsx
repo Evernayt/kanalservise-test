@@ -1,20 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import ScreenContext from "./ScreenContext";
+import { Auth, Posts } from "./src/screens";
+import { useState, useEffect } from "react";
+import { useWindowDimensions } from "react-native";
+
+export type StackParamList = {
+  Auth: undefined;
+  Posts: undefined;
+};
+
+const Stack = createNativeStackNavigator<StackParamList>();
 
 export default function App() {
+  const [isTablet, setIsTablet] = useState<boolean>(false);
+
+  const { width } = useWindowDimensions();
+
+  useEffect(() => {
+    if (width > 600) {
+      setIsTablet(true);
+    } else {
+      setIsTablet(false);
+    }
+  }, [width]);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <ScreenContext.Provider value={{ isTablet }}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          initialRouteName={"Auth"}
+        >
+          <Stack.Screen name="Auth" component={Auth} />
+          <Stack.Screen name="Posts" component={Posts} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ScreenContext.Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
